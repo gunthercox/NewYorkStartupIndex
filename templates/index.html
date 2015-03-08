@@ -106,6 +106,7 @@
 	</script>
 	<script>
 
+    var excludeTypes = "";
     var rendered_map_points = [];
 
     // Create a new map centered around harlem
@@ -238,7 +239,7 @@
     function renderMarker(lat, lon) {
         $.ajax({
             type: "GET",
-            url: "/business_licenses?radius=0.2&lat=" + lat + "&lon=" + lon
+            url: "/business_licenses?radius=0.2&lat=" + lat + "&lon=" + lon + "&exclude_type=" + excludeTypes
         }).done(function(data) {
 
             var new_data = [];
@@ -272,6 +273,33 @@
 
         });
     }
+
+    $("#bus").click(function() {
+        var token = "Bus+";
+        if (this.checked) {
+            excludeTypes += token;
+        } else {
+            excludeTypes.replace(token, "");
+        }
+    });
+
+    $("#bike").click(function() {
+        var token = "Bike+";
+        if (this.checked) {
+            excludeTypes += token;
+        } else {
+            excludeTypes.replace(token, "");
+        }
+    });
+
+    $("#subway").click(function() {
+        var token = "Subways+";
+        if (this.checked) {
+            excludeTypes += token;
+        } else {
+            excludeTypes.replace(token, "");
+        }
+    });
 
   </script>
 
