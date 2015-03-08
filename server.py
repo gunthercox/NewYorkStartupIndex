@@ -26,12 +26,6 @@ def populate():
     Fill the database with wonderfull data
     """
     # Clear the previous collection data
-    '''
-    client.geo['bus_stops'].remove()
-    client.geo['shelters'].remove()
-    client.geo['subways'].remove()
-    client.geo['for_hire_vehicles'].remove()
-    '''
     client.geo['crime'].remove()
     client.geo['business_licenses'].remove()
     client.geo['public_transportation'].remove()
@@ -154,8 +148,10 @@ def public_transportation():
     if "exclude_type" in request.args:
         arguments = request.args["exclude_type"].split(" ")
 
-        for argument in arguments:
-            types.remove(argument)
+        # If all of the request items are in the types list
+        if [i for i in types if i in arguments]:
+            for argument in arguments:
+                types.remove(argument)
 
     if "radius" in request.args:
 
