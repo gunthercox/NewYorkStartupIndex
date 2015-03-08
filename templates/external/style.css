@@ -27,7 +27,7 @@ body {
 	background-color: rgba(0,0,0,0.7);
 	box-sizing: border-box;
 	text-align: center;
-	font-size: 80%;
+	font-size: 75%;
 	border-left: 1px solid rgba(255,255,255,0.2);
 	color: #FFFFFF;
 	width: 150px;
@@ -89,4 +89,28 @@ body {
 	background-color: #D1D1D1;
 	height: 400px;
 	width: auto;
+}
+
+.crimecolor, .publictranscolor
+{
+	float: left;
+	display: inline-block;
+	width: 15px;
+	height: 15px;
+	border-radius: 5px;
+}
+
+.crimecolor
+{
+	background-color: rgba(205, 0, 0, 1);
+}
+
+.publictranscolor
+{
+	background-color: rgba(0, 4, 143, 1);
+}
+
+#blocks
+{
+	width: 50px;
 }
