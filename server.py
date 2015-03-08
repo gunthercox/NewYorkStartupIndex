@@ -148,13 +148,22 @@ def business_licenses():
 
 @app.route("/public_transportation")
 def public_transportation():
+
+    types = ["Taxis", "Bus", "Bike", "Subways"]
+
+    if "exclude_type" in request.args:
+        arguments = request.args["exclude_type"].split(" ")
+
+        for argument in arguments:
+            types.remove(argument)
+
     if "radius" in request.args:
 
         lat = float(request.args["lat"])
         lon = float(request.args["lon"])
         radius = float(request.args["radius"])
 
-        crime = client.geo['public_transportation'].find({
+        transportation = client.geo['public_transportation'].find({
             "geometry": {
                 "$geoWithin": {
                     "$centerSphere": [
@@ -163,12 +172,14 @@ def public_transportation():
                         radius / 3959.0
                     ]
                 }
+            }, "properties.type": {
+                "$in": types
             }
         })
     else:
-        crime = client.geo['public_transportation'].find()
+        transportation = client.geo['public_transportation'].find()
 
-    results = json.loads(dumps(crime))
+    results = json.loads(dumps(transportation))
     return jsonify({
         "type": "FeatureCollection",
         "features": results
