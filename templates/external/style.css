@@ -1,0 +1,92 @@
+body {
+	font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
+	font-weight: 300;
+	padding: 0;
+	margin: 0;
+}
+.header {
+	padding: .4em 1.2em;
+	font-size: 150%;
+	background-color: #063458;
+	color: #FFFFFF;
+	width: auto;
+	opacity: 0.8;
+}
+
+.map
+{
+	margin: 15px 20px;
+	background-image: url("http://www.codeproject.com/KB/scripting/Use_of_Google_Map/coolcode2.jpg");
+	/*background-color: #063458;/*#D1D1D1; */
+	height: 400px;
+	width: auto;
+}
+
+.menu, .collapse
+{
+	background-color: rgba(0,0,0,0.7);
+	box-sizing: border-box;
+	text-align: center;
+	font-size: 80%;
+	border-left: 1px solid rgba(255,255,255,0.2);
+	color: #FFFFFF;
+	width: 150px;
+	height: 100%;
+	float: right;
+}
+
+.collapse
+{
+	padding: .2em;
+	width:15px;
+	display: table;
+	font-size: 65%;
+}
+
+.collapse  p{
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.collapse:hover {
+	background-color: rgba(76,76,76,0.7);
+	cursor: pointer;
+	cursor: hand;
+}
+
+.menu ul {
+	padding: 0;
+	margin: 0;
+}
+.menu ul li{
+	border-bottom: 1px solid rgba(255,255,255,0.2);
+	display: block;
+	padding: .3em 1em;
+	list-style: none;
+}
+
+.menu ul li.submenu {
+	background-color: rgba(135, 175, 116, 0.7);
+	cursor: pointer;
+	cursor: hand;
+}
+
+.menu ul li:hover {
+	background-color: rgba(255,255,255,0.2);
+	cursor: pointer;
+	cursor: hand;
+}
+
+.menu ul li.selected {
+	background-color: rgba(39, 119, 0, 0.7);
+	cursor: pointer;
+	cursor: hand;
+}
+
+.charts
+{
+	margin: 15px 20px;
+	background-color: #D1D1D1;
+	height: 400px;
+	width: auto;
+}
