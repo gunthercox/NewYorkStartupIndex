@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<link rel="stylesheet" href="css/jquery-ui.min.css">
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css"/>
+    <link rel="stylesheet" href="css/style.css"/>
+</head>
+
+<body>
+<div class="header">
+    New York Startup Index
+</div>
+
+<p style="text-align: center;">
+    The New York Startup Index ranks locations within New York City and surrounding areas to determine how suitable they are for a new startup.
+</p>
+
+<div class="map">
+	<div class="menu shown">
+		<ul>
+			<li>Traffic Density</li>
+			<li class="submenu">
+				<div class="slider"></div>
+				<label for="amount">Time of Day Range:</label>
+				<input type="text" id="amount" readonly style="border:0;">
+			<li class="selected">Crimes</li>
+			<li class="selected">Public Transportation</li>
+			<li class="submenu autoselect">
+				<input type="checkbox" id="bus" value="Bus" checked>Bus<br/>
+				<input type="checkbox" id="bike" value="Bike" checked>Bike<br/>
+				<input type="checkbox" id="subway" value="Subway" checked>Subway
+			</li>
+			<li class="selected">Competition</li>
+			<li class="submenu autoselect">
+			    <label for="blocks">Radius (in blocks):</label>
+			    <input type="number" id="blocks" value="5" />
+			</li>
+		</ul>
+	</div>
+	<div class="collapse">
+	<p>>></p>
+	</div>
+
+    <div id="map"></div>
+    <br style="clear: both;"/>
+
+</div>
+
+<div class="graphs">
+	
+</div>
+
+	<script src="js/jquery.js"></script>
+    <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+	<script src="js/jquery-ui.min.js"></script>
+	<script>
+		$(document).ready(function(){
+			$(".menu ul li.submenu:not(.autoselect)").hide();
+			$(".slider").slider({
+				range: true,
+				min: 0,
+				max: 24,
+				values: [8, 16],
+				slide: function( event, ui) {
+					$("#amount").val(ui.values[0] + " - " + ui.values[1]);
+				}
+			});
+			$( "#amount" ).val( $( ".slider" ).slider( "values", 0 ) +
+      " - " + $( ".slider" ).slider( "values", 1 ) );
+			$(".collapse").click(function() {
+				$(".collapse").hide();
+				$(".menu").toggle("slide", {
+				    direction: "right"
+				}, function () {
+				    $(".collapse").show();
+				}).toggleClass("shown");
+				if($(".menu").hasClass("shown"))
+				{
+					$(".collapse p").text(">>");
+				}
+				else
+				{
+					$(".collapse p").text("<<");
+				}
+			});
+			
+			$(".menu ul li").click(function() {
+				if(!$(this).hasClass("submenu"))
+				{
+					$(this).toggleClass("selected");
+					if($(this).hasClass("selected"))
+					{
+						if($(this).next("li").hasClass("submenu"))
+						{
+							$(this).next("li").show();
+						}
+					}
+					else
+					{
+						if($(this).next("li").hasClass("submenu"))
+						{
+							$(this).next("li").hide();
+						}
+					}
+				}
+			});
+		});
+	</script>
+
+  <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+  <script>
+
+    var rendered_map_points = [];
+
+    // Create a new map centered around harlem
+    var harlem = [40.8090, -73.9484];
+    var map = L.map('map').setView(harlem, 16);
+
+    // Add an initial marker to the map
+    var marker = L.marker(harlem).addTo(map);
+
+    // Event triggered when the map is clicked
+    map.on("click", function(event) {
+
+        // Remove the previous map marker
+        map.removeLayer(marker);
+
+        // Add a marker to the map at the location it was clicked
+        marker = L.marker([event.latlng.lat, event.latlng.lng]).addTo(map);
+
+        // Render the detail pane
+        // TODO
+    });
+
+    map.on("drag", function(event) {
+
+        var bounds = map.getBounds();
+        renderCluster(bounds.getCenter().lng, bounds.getCenter().lat);
+        renderTransportation(bounds.getCenter().lng, bounds.getCenter().lat);
+        renderMarker(bounds.getCenter().lng, bounds.getCenter().lat);
+    });
+
+
+    L.tileLayer('http://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
+        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+        id: 'examples.map-20v6611k' // gunthercox.ldajcpgp
+    }).addTo(map);
+
+
+    function renderCluster(lat, lon) {
+        $.ajax({
+            type: "GET",
+            url: "/crime?radius=0.2&lat=" + lat + "&lon=" + lon
+        }).done(function(data) {
+
+            var new_data = [];
+
+            // Prevent duplicate points from being added
+            for (var i = 0; i < data.features.length; i++) {
+                var id = data.features[i]._id.$oid;
+
+                if (rendered_map_points.indexOf(id) === -1) {
+                    rendered_map_points.push(id);
+                    new_data.push(data.features[i])   
+                }
+            }
+
+            // Put dots at places with geojson
+            L.geoJson(new_data, {
+                style: function (feature) {
+                    return {
+                        color: feature.properties.color
+                    };
+                },
+                onEachFeature: function (feature, layer) {
+
+                    var popup = L.popup()
+                        .setContent('<p><strong>' + feature.properties.type + '</strong></p>');
+
+                    layer.bindPopup(popup);
+
+                },
+                pointToLayer: function (geojson, latlng) {
+                    return L.circle([latlng.lat, latlng.lng], 50, {
+                        color: 'transparent',
+                        fillColor: 'red',
+                        fillOpacity: 0.1
+                    })
+                }
+            }).addTo(map);
+
+        });
+    }
+
+    function renderTransportation(lat, lon) {
+        $.ajax({
+            type: "GET",
+            url: "/public_transportation?radius=0.2&lat=" + lat + "&lon=" + lon
+        }).done(function(data) {
+
+            var new_data = [];
+
+            // Prevent duplicate points from being added
+            for (var i = 0; i < data.features.length; i++) {
+                var id = data.features[i]._id.$oid;
+
+                if (rendered_map_points.indexOf(id) === -1) {
+                    rendered_map_points.push(id);
+                    new_data.push(data.features[i])   
+                }
+            }
+
+            // Put dots at places with geojson
+            L.geoJson(new_data, {
+                style: function (feature) {
+                    return {
+                        color: feature.properties.color
+                    };
+                },
+                onEachFeature: function (feature, layer) {
+
+                    // If a description is available, add it.
+                    if (feature.properties.description) {
+                        var popup = L.popup()
+                            .setContent('<p>' + feature.properties.description + '</p>');
+
+                        layer.bindPopup(popup);
+                    }
+                },
+                pointToLayer: function (geojson, latlng) {
+                    return L.circle([latlng.lat, latlng.lng], 100, {
+                        color: 'transparent',
+                        fillColor: 'blue',
+                        fillOpacity: 0.1
+                    })
+                }
+            }).addTo(map);
+
+        });
+    }
+
+    function renderMarker(lat, lon) {
+        $.ajax({
+            type: "GET",
+            url: "/business_licenses?radius=0.2&lat=" + lat + "&lon=" + lon
+        }).done(function(data) {
+
+            var new_data = [];
+
+            // Prevent duplicate points from being added
+            for (var i = 0; i < data.features.length; i++) {
+                var id = data.features[i]._id.$oid;
+
+                if (rendered_map_points.indexOf(id) === -1) {
+                    rendered_map_points.push(id);
+                    new_data.push(data.features[i])   
+                }
+            }
+
+            // Put dots at places with geojson
+            L.geoJson(new_data, {
+                style: function (feature) {
+                    return {
+                        color: feature.properties.color
+                    };
+                },
+                onEachFeature: function (feature, layer) {
+
+                    var popup = L.popup()
+                        .setContent('<p><strong>' + feature.properties.FIELD1 + '</strong>' +
+                                '<br/>' + feature.properties.FIELD2 + '.</p>');
+
+                    layer.bindPopup(popup);
+                }
+            }).addTo(map);
+
+        });
+    }
+
+  </script>
+
+</body>
+</html>
