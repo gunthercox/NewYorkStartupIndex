@@ -149,8 +149,8 @@ def public_transportation():
         arguments = request.args["exclude_type"].split(" ")
 
         # If all of the request items are in the types list
-        if [i for i in types if i in arguments]:
-            for argument in arguments:
+        for argument in arguments:
+            if argument in types:
                 types.remove(argument)
 
     if "radius" in request.args:

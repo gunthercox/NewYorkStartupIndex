@@ -111,38 +111,42 @@
 
     // Create a new map centered around harlem
     var harlem = [40.8090, -73.9484];
-    var map = L.map('map').setView(harlem, 16);
+    var map = null;
+    initMap(harlem);
 
-    // Add an initial marker to the map
-    var marker = L.marker(harlem).addTo(map);
+    function initMap(coords) {
+        map = L.map('map').setView(coords, 16);
 
-    // Event triggered when the map is clicked
-    map.on("click", function(event) {
+        // Add an initial marker to the map
+        var marker = L.marker(harlem).addTo(map);
 
-        // Remove the previous map marker
-        map.removeLayer(marker);
+        // Event triggered when the map is clicked
+        map.on("click", function(event) {
 
-        // Add a marker to the map at the location it was clicked
-        marker = L.marker([event.latlng.lat, event.latlng.lng]).addTo(map);
+            // Remove the previous map marker
+            map.removeLayer(marker);
 
-        // Render the detail pane
-        // TODO
-    });
+            // Add a marker to the map at the location it was clicked
+            marker = L.marker([event.latlng.lat, event.latlng.lng]).addTo(map);
 
-    map.on("drag", function(event) {
+            // Render the detail pane
+            // TODO
+        });
 
-        var bounds = map.getBounds();
-        renderCluster(bounds.getCenter().lng, bounds.getCenter().lat);
-        renderTransportation(bounds.getCenter().lng, bounds.getCenter().lat);
-        renderMarker(bounds.getCenter().lng, bounds.getCenter().lat);
-    });
+        map.on("drag", function(event) {
+
+            var bounds = map.getBounds();
+            renderCluster(bounds.getCenter().lng, bounds.getCenter().lat);
+            renderTransportation(bounds.getCenter().lng, bounds.getCenter().lat);
+            renderMarker(bounds.getCenter().lng, bounds.getCenter().lat);
+        });
 
 
-    L.tileLayer('http://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
-        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-        id: 'examples.map-20v6611k' // gunthercox.ldajcpgp
-    }).addTo(map);
-
+        L.tileLayer('http://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
+            attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+            id: 'examples.map-20v6611k' // gunthercox.ldajcpgp
+        }).addTo(map);
+    }
 
     function renderCluster(lat, lon) {
         $.ajax({
@@ -192,7 +196,7 @@
     function renderTransportation(lat, lon) {
         $.ajax({
             type: "GET",
-            url: "/public_transportation?radius=0.2&lat=" + lat + "&lon=" + lon
+            url: "/public_transportation?radius=0.2&lat=" + lat + "&lon=" + lon + "&exclude_type=" + excludeTypes
         }).done(function(data) {
 
             var new_data = [];
@@ -239,7 +243,7 @@
     function renderMarker(lat, lon) {
         $.ajax({
             type: "GET",
-            url: "/business_licenses?radius=0.2&lat=" + lat + "&lon=" + lon + "&exclude_type=" + excludeTypes
+            url: "/business_licenses?radius=0.2&lat=" + lat + "&lon=" + lon
         }).done(function(data) {
 
             var new_data = [];
@@ -275,29 +279,38 @@
     }
 
     $("#bus").click(function() {
+        var center = map.getCenter();
+        map.remove();
+        initMap([center.lat, center.lng]);
         var token = "Bus+";
         if (this.checked) {
-            excludeTypes += token;
-        } else {
             excludeTypes.replace(token, "");
+        } else {
+            excludeTypes += token;
         }
     });
 
     $("#bike").click(function() {
+        var center = map.getCenter();
+        map.remove();
+        initMap([center.lat, center.lng]);
         var token = "Bike+";
         if (this.checked) {
-            excludeTypes += token;
-        } else {
             excludeTypes.replace(token, "");
+        } else {
+            excludeTypes += token;
         }
     });
 
     $("#subway").click(function() {
+        var center = map.getCenter();
+        map.remove();
+        initMap([center.lat, center.lng]);
         var token = "Subways+";
         if (this.checked) {
-            excludeTypes += token;
-        } else {
             excludeTypes.replace(token, "");
+        } else {
+            excludeTypes += token;
         }
     });
 
