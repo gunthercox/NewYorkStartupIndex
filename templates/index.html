@@ -30,7 +30,7 @@
 			<li class="selected">Competition</li>
 			<li class="submenu autoselect">
 			    <label for="blocks">Radius (in blocks):</label>
-			    <input type="number" id="blocks" value="5" />
+			    <input type="number" id="blocks" value="0.2" />
 			</li>
 		</ul>
 	</div>
@@ -43,7 +43,7 @@
 
 </div>
 
-<div class="charts">
+<!--div class="charts">
 	<ul>
 		<li><a href="#graph1">Graph 1</a></li>
 		<li><a href="#graph2">Graph 2</a></li>
@@ -54,7 +54,7 @@
 	<div id="graph2">Graph 2</div>
 	<div id="graph3">Graph 3</div>
 	<div id="graph4">Graph 4</div>
-</div>
+</div-->
 
 	<script src="js/jquery.js"></script>
     <script src="external/jquery-ui/jquery-ui.min.js"></script>
@@ -149,9 +149,10 @@
     }
 
     function renderCluster(lat, lon) {
+        var radius = $("#blocks").val();
         $.ajax({
             type: "GET",
-            url: "/crime?radius=0.2&lat=" + lat + "&lon=" + lon
+            url: "/crime?radius=" + radius + "&lat=" + lat + "&lon=" + lon
         }).done(function(data) {
 
             var new_data = [];
@@ -194,9 +195,10 @@
     }
 
     function renderTransportation(lat, lon) {
+        var radius = $("#blocks").val();
         $.ajax({
             type: "GET",
-            url: "/public_transportation?radius=0.2&lat=" + lat + "&lon=" + lon + "&exclude_type=" + excludeTypes
+            url: "/public_transportation?radius=" + radius + "&lat=" + lat + "&lon=" + lon + "&exclude_type=" + excludeTypes
         }).done(function(data) {
 
             var new_data = [];
@@ -241,9 +243,10 @@
     }
 
     function renderMarker(lat, lon) {
+        var radius = $("#blocks").val();
         $.ajax({
             type: "GET",
-            url: "/business_licenses?radius=0.2&lat=" + lat + "&lon=" + lon
+            url: "/business_licenses?radius=" + radius + "&lat=" + lat + "&lon=" + lon
         }).done(function(data) {
 
             var new_data = [];
