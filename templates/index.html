@@ -19,11 +19,6 @@
 <div class="map">
 	<div class="menu shown">
 		<ul>
-			<li>Traffic Density</li>
-			<li class="submenu">
-				<div class="slider"></div>
-				<label for="amount">Time of Day Range:</label>
-				<input type="text" id="amount" readonly style="border:0;">
 			<li class="selected">Crimes</li>
 			<li class="selected">Public Transportation</li>
 			<li class="submenu autoselect">
@@ -68,17 +63,6 @@
 		$(document).ready(function(){
 			$(".menu ul li.submenu:not(.autoselect)").hide();
 			$(".charts").tabs();
-			$(".slider").slider({
-				range: true,
-				min: 0,
-				max: 24,
-				values: [8, 16],
-				slide: function( event, ui) {
-					$("#amount").val(ui.values[0] + " - " + ui.values[1]);
-				}
-			});
-			$( "#amount" ).val( $( ".slider" ).slider( "values", 0 ) +
-      " - " + $( ".slider" ).slider( "values", 1 ) );
 			$(".collapse").click(function() {
 				$(".collapse").hide();
 				$(".menu").toggle("slide", {
